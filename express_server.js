@@ -44,14 +44,29 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 })
 
+app.get("/u/:shortURL", (req, res) => {
+  const shorty = req.params.shortURL;
+  const longURL = urlDatabase[shorty];
+  res.redirect(longURL);
+});
+
+//function
+const generateRandomString = () => {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let string = '';
+  for (let c = 0; c <= 6; c++) {
+    string += characters[Math.floor(Math.random() * characters.length)]
+  }
+  return string;
+}
+
+
 //posts
 app.post("/urls", (req, res) => {
-  console.log(req.body);
-  res.send("Ok");
+  const shortURL = generateRandomString();
+  urlDatabase[shortURL] = req.body.longURL;
+  console.log(req.body, urlDatabase);
+  res.redirect(`/urls/${shortURL}`)
 });
 
 
-//functions
-const generateRandomString = () {
-  
-}
