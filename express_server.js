@@ -50,6 +50,10 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
+// app.get("/urls/:shortURL/delete", (req, res) => {
+
+// })
+
 
 //function
 const generateRandomString = () => {
@@ -63,10 +67,17 @@ const generateRandomString = () => {
 
 
 //posts
-app.post("/urls", (req, res) => {
+app.post("/urls/new", (req, res) => {
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = req.body.longURL;
   console.log(req.body, urlDatabase);
   res.redirect(`/urls/${shortURL}`);
 });
+
+app.post("/urls/:shortURL/delete", (req, res) => {
+  const shorty = req.params.shortURL;
+  delete urlDatabase[shorty];
+  console.log(req.params);
+  res.redirect("/urls")
+})
 
