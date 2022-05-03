@@ -67,17 +67,17 @@ app.post("/urls/new", (req, res) => {
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = req.body.longURL;
   res.redirect(`/urls/${shortURL}`);
-});//submit button
+});//submit button new
 
 app.post("/urls/:shortURL/delete", (req, res) => {
   const shorty = req.params.shortURL;
   delete urlDatabase[shorty];
   res.redirect("/urls");
-});//delete buttons
+});//delete buttons index
 
 app.post("/urls/:shortURL", (req, res) => {
   const shorty = req.params.shortURL;
   urlDatabase[shorty] = req.body.newLongURL;
   res.redirect(`/urls/${shorty}`)
-});//edit button
+});//edit button show
 
