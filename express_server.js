@@ -50,12 +50,8 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
-// app.get("/urls/:shortURL/delete", (req, res) => {
 
-// })
-
-
-//function
+//functions
 const generateRandomString = () => {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let string = '';
@@ -70,14 +66,18 @@ const generateRandomString = () => {
 app.post("/urls/new", (req, res) => {
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = req.body.longURL;
-  console.log(req.body, urlDatabase);
   res.redirect(`/urls/${shortURL}`);
-});
+});//submit button
 
 app.post("/urls/:shortURL/delete", (req, res) => {
   const shorty = req.params.shortURL;
   delete urlDatabase[shorty];
-  console.log(req.params);
-  res.redirect("/urls")
-})
+  res.redirect("/urls");
+});//delete buttons
+
+app.post("/urls/:shortURL", (req, res) => {
+  const shorty = req.params.shortURL;
+  urlDatabase[shorty] = req.body.newLongURL;
+  res.redirect(`/urls/${shorty}`)
+});//edit button
 
