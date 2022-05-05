@@ -29,13 +29,13 @@ const users = {
   }
 }
 
-// templateVarss = {
-//   user_id: req.cookies.user_id,
-//   username: users.user_id,
-//   urls: urlDatabase,
-//   shortURL: req.params.shortURL,
-//   longURL: urlDatabase.shortURL
-// }
+  // const shortURL = req.params.shortURL;
+  // const user_id = req.cookies.user_id;
+  // const templateVars = { 
+  //   shortURL: shortURL, 
+  //   longURL: urlDatabase[shortURL], 
+  //   username: users[user_id],
+  //   urls: urlDatabase};
 
 
 //gets
@@ -53,31 +53,37 @@ app.get("/hello", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   const shortURL = req.params.shortURL;
-  const user_id = req.cookies.user_id
+  const user_id = req.cookies.user_id;
   const templateVars = { 
     shortURL: shortURL, 
     longURL: urlDatabase[shortURL], 
-    username: users[user_id]};
+    username: users[user_id],
+    urls: urlDatabase,
+    user_id: user_id};
   res.render("urls_new", templateVars);
 });
 
 app.get("/urls", (req, res) => {
   const shortURL = req.params.shortURL;
-  const user_id = req.cookies.user_id
+  const user_id = req.cookies.user_id;
   const templateVars = { 
     shortURL: shortURL, 
     longURL: urlDatabase[shortURL], 
-    username: users[user_id]};
+    username: users[user_id],
+    urls: urlDatabase,
+    user_id: user_id};
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
-  const user_id = req.cookies.user_id
+  const user_id = req.cookies.user_id;
   const templateVars = { 
     shortURL: shortURL, 
     longURL: urlDatabase[shortURL], 
-    username: users[user_id]};
+    username: users[user_id],
+    urls: urlDatabase,
+    user_id: user_id};
   res.render("urls_show", templateVars);
 });
 
@@ -89,11 +95,13 @@ app.get("/u/:shortURL", (req, res) => {
 
 app.get("/register", (req, res) => {
   const shortURL = req.params.shortURL;
-  const user_id = req.cookies.user_id
+  const user_id = req.cookies.user_id;
   const templateVars = { 
     shortURL: shortURL, 
     longURL: urlDatabase[shortURL], 
-    username: users[user_id]};
+    username: users[user_id],
+    urls: urlDatabase,
+    user_id: user_id};
   res.render("registration", templateVars);
 })
 
