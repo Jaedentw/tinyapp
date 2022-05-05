@@ -23,8 +23,8 @@ const urlDatabase = {
 
 const users = {
   'user': { 
-    id: '',
-    email: '',
+    id: 'user',
+    email: 'jay@me.com',
     password: '',
   }
 }
@@ -100,7 +100,6 @@ app.get("/register", (req, res) => {
     shortURL: shortURL, 
     longURL: urlDatabase[shortURL], 
     username: users[user_id],
-    urls: urlDatabase,
     user_id: user_id};
   res.render("registration", templateVars);
 })
@@ -114,6 +113,15 @@ const generateRandomString = () => {
     string += characters[Math.floor(Math.random() * characters.length)];
   }
   return string;
+};
+
+const checkEmails = (email) => {
+  for (let user in users) {
+    if (users[user]['email'] === email) {
+      return false;
+    }
+  }
+  return true;
 };
 
 
@@ -137,8 +145,7 @@ app.post("/urls/:shortURL", (req, res) => {
 });//edit button show
 
 app.post("/login", (req, res) => {
-  res.cookie('username', req.body.username);
-  res.redirect('/urls');
+  res.redirect('/register');
 });//login button header
 
 app.post("/logout", (req, res) => {
@@ -148,11 +155,22 @@ app.post("/logout", (req, res) => {
 
 app.post("/register", (req, res) => {
   const userID = generateRandomString();
-  users[userID] = { 
-    id: userID, 
-    email: req.body.email, 
-    password: req.body.password};
-  res.cookie('user_id', userID);
-  res.redirect('/urls');
+  const email = req.body.email;
+  const password = req.body.password;
+  if (email && password && checkEmails(email)) {
+    users[userID] = { 
+      id: userID, 
+      email: email, 
+      password: password
+    };
+    res.cookie('user_id', {userID, email, password});
+    res.redirect('/urls');
+  } else {
+    if (checkEmails(email)) {
+      res.status(400).send({Error: 'please enter valid email and password'});
+    } else {
+      res.status(400).send({Error: 'This email is already registered'})
+    }
+  }
 })
 
