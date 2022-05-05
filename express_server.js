@@ -101,7 +101,15 @@ app.get("/register", (req, res) => {
     username: users[user_id],
     user_id: user_id};
   res.render("registration", templateVars);
-})
+});
+
+app.get("/login", (req, res) => {
+  const user_id = req.cookies.user_id;
+  const templateVars = {  
+    username: users[user_id],
+    user_id: user_id};
+  res.render("login", templateVars);
+});
 
 
 //functions
@@ -144,7 +152,7 @@ app.post("/urls/:shortURL", (req, res) => {
 });//edit button show
 
 app.post("/login", (req, res) => {
-  res.redirect('/register');
+  res.redirect('/login');
 });//login button header
 
 app.post("/logout", (req, res) => {
