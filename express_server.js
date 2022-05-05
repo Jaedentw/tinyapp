@@ -35,7 +35,9 @@ const users = {
   //   shortURL: shortURL, 
   //   longURL: urlDatabase[shortURL], 
   //   username: users[user_id],
-  //   urls: urlDatabase};
+  //   urls: urlDatabase, 
+  //   user_id: user_id 
+  //  };
 
 
 //gets
@@ -94,11 +96,8 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  const shortURL = req.params.shortURL;
   const user_id = req.cookies.user_id;
-  const templateVars = { 
-    shortURL: shortURL, 
-    longURL: urlDatabase[shortURL], 
+  const templateVars = {  
     username: users[user_id],
     user_id: user_id};
   res.render("registration", templateVars);
@@ -155,8 +154,7 @@ app.post("/logout", (req, res) => {
 
 app.post("/register", (req, res) => {
   const userID = generateRandomString();
-  const email = req.body.email;
-  const password = req.body.password;
+  const {email, password }= req.body;
   if (email && password && checkEmails(email)) {
     users[userID] = { 
       id: userID, 
