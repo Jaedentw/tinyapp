@@ -88,8 +88,8 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  const shorty = req.params.shortURL;
-  const longURL = urlDatabase[shorty];
+  const shortURL = req.params.shortURL;
+  const longURL = urlDatabase[shortURL];
   res.redirect(longURL);
 });
 
@@ -142,7 +142,7 @@ app.post("/login", (req, res) => {
 });//login button header
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect('/urls');
 });//logout button header
 
