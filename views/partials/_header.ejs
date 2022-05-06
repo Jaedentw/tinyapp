@@ -13,17 +13,17 @@
 
     <% if(user_id) { %>
       <div class="col">
-        Logged in as: <%=  user_id['email'] %>
+        Logged in as: <%=  username['email'] %>
       </div>
       <form method="POST" action="/logout">
       <button type="submit" class="btn btn-outline-dark">Logout</button>
       </form>
     <% } else { %>
       <form method="POST" action="/logins">
-        <button type="submit" class="btn btn-outline-dark">Login</button>
+        <button type="submit" class="btn btn-dark">Login</button>
       </form>
       <form method="POST" action="/registers">
-        <button type="submit" class="btn btn-dark">Register</button>
+        <button type="submit" class="btn btn-outline-dark">Register</button>
       </form>
     <% } %>
   </nav>

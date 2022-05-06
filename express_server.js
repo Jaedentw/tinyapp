@@ -74,6 +74,7 @@ app.get("/urls", (req, res) => {
     username: users[user_id],
     urls: urlDatabase,
     user_id: user_id};
+    console.log(templateVars.username);
   res.render("urls_index", templateVars);
 });
 
@@ -131,6 +132,15 @@ const checkEmails = (email) => {
   return true;
 };
 
+const findUserByEmail = (email) => {
+  for (let user in users) {
+    if (users[user]['email'] === email) {
+      return users[user]['id'];
+    }
+  }
+  return false;
+}
+
 
 //posts
 app.post("/urls/new", (req, res) => {
@@ -155,14 +165,14 @@ app.post("/logins", (req, res) => {
   res.redirect('/login');
 });//login button header
 
+app.post("/registers", (req, res) => {
+  res.redirect('/register');
+})//register button header
+
 app.post("/logout", (req, res) => {
   res.clearCookie('user_id');
   res.redirect('/urls');
 });//logout button header
-
-app.post("/registers", (req, res) => {
-  res.redirect('/register');
-})//register button header
 
 app.post("/register", (req, res) => {
   const userID = generateRandomString();
@@ -173,7 +183,6 @@ app.post("/register", (req, res) => {
       email: email, 
       password: password
     };
-    res.cookie('user_id', {userID, email, password});
     res.redirect('/urls');
   } else {
     if (checkEmails(email)) {
@@ -182,5 +191,19 @@ app.post("/register", (req, res) => {
       res.status(400).send({Error: 'This email is already registered'})
     }
   }
-})
+});//registration button on registration page + error handler
 
+app.post("/login", (req, res) => {
+  const {email, password }= req.body;
+  if (checkEmails(email) === false) {
+    const userID = findUserByEmail(email);
+    if(email === users[userID]['email'] && password === users[userID]['password']) {
+      res.cookie('user_id', userID);
+      res.redirect('/urls');
+    } else {
+      res.status(403).send({Error: 'Email and password do not match'});
+    }
+  } else {
+    res.status(403).send({Error: 'Email not registered'});
+  }
+});
