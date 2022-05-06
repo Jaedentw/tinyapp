@@ -151,7 +151,7 @@ app.post("/urls/:shortURL", (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });//edit button show
 
-app.post("/login", (req, res) => {
+app.post("/logins", (req, res) => {
   res.redirect('/login');
 });//login button header
 
@@ -159,6 +159,10 @@ app.post("/logout", (req, res) => {
   res.clearCookie('user_id');
   res.redirect('/urls');
 });//logout button header
+
+app.post("/registers", (req, res) => {
+  res.redirect('/register');
+})//register button header
 
 app.post("/register", (req, res) => {
   const userID = generateRandomString();
