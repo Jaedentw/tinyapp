@@ -11,11 +11,11 @@
       </div>
     </div>
 
-    <% if(user_id) { %>
-      <div>
+    <% if(username) { %>
+      <div class="col">
         Logged in as: <%=  username['email'] %>
       </div>
-      <div class="col">
+      <div>
         <form method="POST" action="/logout">
           <button type="submit" class="btn btn-outline-dark">Logout</button>
         </form>

@@ -17,27 +17,29 @@ app.listen(PORT, () => {
 
 //global objects
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  shortURL: {
+    longURL: 'longURL',
+    userID: 'userID'
+  }
 };
 
 const users = {
   'user': { 
     id: 'user',
     email: 'jay@me.com',
-    password: '',
+    password: 'password',
   }
 }
 
-  // const shortURL = req.params.shortURL;
-  // const user_id = req.cookies.user_id;
-  // const templateVars = { 
-  //   shortURL: shortURL, 
-  //   longURL: urlDatabase[shortURL], 
-  //   username: users[user_id],
-  //   urls: urlDatabase, 
-  //   user_id: user_id 
-  //  };
+// const shortURL = req.params.shortURL;
+// const user_id = req.cookies.user_id;
+// const templateVars = { 
+//   shortURL: shortURL, 
+//   longURL: urlDatabase[shortURL], 
+//   username: users[user_id],
+//   urls: urlDatabase, 
+//   user_id: user_id 
+//  };
 
 
 //gets
@@ -83,7 +85,7 @@ app.get("/urls/:shortURL", (req, res) => {
   const user_id = req.cookies.user_id;
   const templateVars = { 
     shortURL: shortURL, 
-    longURL: urlDatabase[shortURL], 
+    longURL: urlDatabase[shortURL]['longURL'], 
     username: users[user_id],
     urls: urlDatabase,
     user_id: user_id};
@@ -92,7 +94,7 @@ app.get("/urls/:shortURL", (req, res) => {
 
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL];
+  const longURL = urlDatabase[shortURL]['longURL'];
   res.redirect(longURL);
 });
 
@@ -144,9 +146,18 @@ const findUserByEmail = (email) => {
 
 //posts
 app.post("/urls/new", (req, res) => {
-  const shortURL = generateRandomString();
-  urlDatabase[shortURL] = req.body.longURL;
-  res.redirect(`/urls/${shortURL}`);
+  const user_id = req.cookies.user_id;
+  if(user_id) {
+    const shortURL = generateRandomString();
+    const longURL = req.body.longURL;
+    urlDatabase[shortURL] = {
+      longURL: longURL,
+      userID: user_id
+    }
+    res.redirect(`/urls/${shortURL}`);
+  } else {
+    res.status(403).send({Error: 'Please login to create new URLs'});
+  }
 });//submit button new
 
 app.post("/urls/:shortURL/delete", (req, res) => {
@@ -157,7 +168,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 app.post("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
-  urlDatabase[shortURL] = req.body.newLongURL;
+  urlDatabase[shortURL]['longURL'] = req.body.newLongURL;
   res.redirect(`/urls/${shortURL}`);
 });//edit button show
 
@@ -183,6 +194,7 @@ app.post("/register", (req, res) => {
       email: email, 
       password: password
     };
+    res.cookie('user_id', userID);
     res.redirect('/urls');
   } else {
     if (checkEmails(email)) {
@@ -206,4 +218,4 @@ app.post("/login", (req, res) => {
   } else {
     res.status(403).send({Error: 'Email not registered'});
   }
-});
+});//login button on login page + error handling
