@@ -1,7 +1,8 @@
+const {urlsForUser, findUserByEmail, checkEmails, generateRandomString} = require("./helpers")
 const cookieSession = require('cookie-session');
 const express = require("express");
 const app = express();
-const PORT = 8080; // default port 8080
+const PORT = 8080;
 const bodyParser = require("body-parser");
 const bcrypt = require('bcryptjs');
 
@@ -35,55 +36,6 @@ const users = {
   }
 };
 
-// const shortURL = req.params.shortURL;
-// const user_id = req.cookies.user_id;
-// const templateVars = {
-//   shortURL: shortURL,
-//   longURL: urlDatabase[shortURL]['longURL'],
-//   username: users[user_id],
-//   urls: urlDatabase,
-//   user_id: user_id
-//  };
-
-
-//functions
-const generateRandomString = () => {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let string = '';
-  for (let c = 0; c <= 6; c++) {
-    string += characters[Math.floor(Math.random() * characters.length)];
-  }
-  return string;
-};
-
-const checkEmails = (email) => {
-  for (let user in users) {
-    if (users[user]['email'] === email) {
-      return false;
-    }
-  }
-  return true;
-};
-
-const findUserByEmail = (email) => {
-  for (let user in users) {
-    if (users[user]['email'] === email) {
-      return users[user]['id'];
-    }
-  }
-  return false;
-};
-
-const urlsForUser = (userID) => {
-  const userURLs = {};
-  for (let shortURL in urlDatabase) {
-    if (urlDatabase[shortURL]['userID'] === userID) {
-      userURLs[shortURL] = urlDatabase[shortURL];
-    }
-  }
-  return userURLs;
-};
-
 
 //gets
 app.get("/", (req, res) => {
@@ -109,7 +61,7 @@ app.get("/urls/new", (req, res) => {
 app.get("/urls", (req, res) => {
   const shortURL = req.params.shortURL;
   const user_id = req.session.user_id;
-  const userURLs = urlsForUser(user_id);
+  const userURLs = urlsForUser(user_id, urlDatabase);
   const templateVars = {
     shortURL: shortURL,
     username: users[user_id],
@@ -121,7 +73,7 @@ app.get("/urls", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const user_id = req.session.user_id;
-  const userURLs = urlsForUser(user_id);
+  const userURLs = urlsForUser(user_id, urlDatabase);
   const templateVars = {
     shortURL: shortURL,
     longURL: userURLs[shortURL]['longURL'],
@@ -217,7 +169,7 @@ app.post("/logout", (req, res) => {
 app.post("/register", (req, res) => {
   const userID = generateRandomString();
   const {email, password } = req.body;
-  if (email && password && checkEmails(email)) {
+  if (email && password && checkEmails(email, users)) {
     const hashedPassword = bcrypt.hashSync(password, 10);
     users[userID] = {
       id: userID,
@@ -227,7 +179,7 @@ app.post("/register", (req, res) => {
     req.session.user_id = userID;
     res.redirect('/urls');
   } else {
-    if (checkEmails(email)) {
+    if (checkEmails(email, users)) {
       res.status(400).send({Error: 'please enter valid email and password'});
     } else {
       res.status(400).send({Error: 'This email is already registered'});
@@ -237,8 +189,8 @@ app.post("/register", (req, res) => {
 
 app.post("/login", (req, res) => {
   const {email, password } = req.body;
-  if (checkEmails(email) === false) {
-    const userID = findUserByEmail(email);
+  if (checkEmails(email, users) === false) {
+    const userID = findUserByEmail(email, users);
     const hashedPassword = users[userID]['password'];
     const isCorrectPass = bcrypt.compareSync(password, hashedPassword);
     if (email === users[userID]['email'] && isCorrectPass) {
