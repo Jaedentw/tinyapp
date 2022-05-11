@@ -4,7 +4,6 @@ const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 const bcrypt = require('bcryptjs');
-const hash = bcrypt.hashSync
 
 app.use(cookieSession({
   name: 'session',
@@ -211,7 +210,7 @@ app.post("/registers", (req, res) => {
 });//register button header
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('user_id');
+  req.session = null;
   res.redirect('/urls');
 });//logout button header
 
@@ -219,14 +218,13 @@ app.post("/register", (req, res) => {
   const userID = generateRandomString();
   const {email, password } = req.body;
   if (email && password && checkEmails(email)) {
-    const hashedPassword = hash(password, 10);
+    const hashedPassword = bcrypt.hashSync(password, 10);
     users[userID] = {
       id: userID,
       email: email,
       password: hashedPassword
     };
-    console.log(password)
-    res.cookie('user_id', userID);
+    req.session.user_id = userID;
     res.redirect('/urls');
   } else {
     if (checkEmails(email)) {
@@ -244,7 +242,7 @@ app.post("/login", (req, res) => {
     const hashedPassword = users[userID]['password'];
     const isCorrectPass = bcrypt.compareSync(password, hashedPassword);
     if (email === users[userID]['email'] && isCorrectPass) {
-      res.cookie('user_id', userID);
+      req.session.user_id = userID;
       res.redirect('/urls');
     } else {
       res.status(403).send({Error: 'Email and password do not match'});
