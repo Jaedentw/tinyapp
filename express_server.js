@@ -3,6 +3,8 @@ const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
+const bcrypt = require('bcryptjs');
+const hash = bcrypt.hashSync
 
 app.use(cookieParser());
 
@@ -214,10 +216,11 @@ app.post("/register", (req, res) => {
   const userID = generateRandomString();
   const {email, password } = req.body;
   if (email && password && checkEmails(email)) {
+    const hashedPassword = bcrypt.hashSync(password, 10);
     users[userID] = {
       id: userID,
       email: email,
-      password: password
+      password: hashedPassword
     };
     res.cookie('user_id', userID);
     res.redirect('/urls');
@@ -234,7 +237,9 @@ app.post("/login", (req, res) => {
   const {email, password } = req.body;
   if (checkEmails(email) === false) {
     const userID = findUserByEmail(email);
-    if (email === users[userID]['email'] && password === users[userID]['password']) {
+    const hashedPassword = users[userID]['password'];
+    const isCorrectPass = bcrypt.compareSync(password, hashedPassword);
+    if (email === users[userID]['email'] && isCorrectPass) {
       res.cookie('user_id', userID);
       res.redirect('/urls');
     } else {
@@ -244,3 +249,4 @@ app.post("/login", (req, res) => {
     res.status(403).send({Error: 'Email not registered'});
   }
 });//login button on login page + error handling
+
