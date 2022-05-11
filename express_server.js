@@ -24,21 +24,21 @@ const urlDatabase = {
 };
 
 const users = {
-  'user': { 
+  'user': {
     id: 'user',
     email: 'jay@me.com',
     password: 'password',
   }
-}
+};
 
 // const shortURL = req.params.shortURL;
 // const user_id = req.cookies.user_id;
-// const templateVars = { 
-//   shortURL: shortURL, 
-//   longURL: urlDatabase[shortURL]['longURL'], 
+// const templateVars = {
+//   shortURL: shortURL,
+//   longURL: urlDatabase[shortURL]['longURL'],
 //   username: users[user_id],
-//   urls: urlDatabase, 
-//   user_id: user_id 
+//   urls: urlDatabase,
+//   user_id: user_id
 //  };
 
 
@@ -68,17 +68,17 @@ const findUserByEmail = (email) => {
     }
   }
   return false;
-}
+};
 
 const urlsForUser = (userID) => {
-  const userURLs = {}
-  for(let shortURL in urlDatabase) {
+  const userURLs = {};
+  for (let shortURL in urlDatabase) {
     if (urlDatabase[shortURL]['userID'] === userID) {
       userURLs[shortURL] = urlDatabase[shortURL];
     }
   }
   return userURLs;
-}
+};
 
 
 //gets
@@ -98,7 +98,7 @@ app.get("/urls/new", (req, res) => {
   const user_id = req.cookies.user_id;
   const templateVars = {
     username: users[user_id]
-    };
+  };
   res.render("urls_new", templateVars);
 });
 
@@ -106,29 +106,35 @@ app.get("/urls", (req, res) => {
   const shortURL = req.params.shortURL;
   const user_id = req.cookies.user_id;
   const userURLs = urlsForUser(user_id);
-  const templateVars = { 
-    shortURL: shortURL,  
+  const templateVars = {
+    shortURL: shortURL,
     username: users[user_id],
     urls: userURLs,
-    };
+  };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const user_id = req.cookies.user_id;
-  const templateVars = { 
-    shortURL: shortURL, 
-    longURL: urlDatabase[shortURL]['longURL'], 
+  const userURLs = urlsForUser(user_id);
+  const templateVars = {
+    shortURL: shortURL,
+    longURL: userURLs[shortURL]['longURL'],
     username: users[user_id],
-    urls: urlDatabase,
-    user_id: user_id};
-  res.render("urls_show", templateVars);
+    urls: userURLs,
+    user_id: user_id
+  };
+  if (user_id) {
+    res.render("urls_show", templateVars);
+  } else {
+    res.status(403).send({Error: "You must be logged in and the creator of the specified URL to access this page."});
+  }
 });
 
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
-  if(urlDatabase[shortURL]) {
+  if (urlDatabase[shortURL]) {
     const longURL = urlDatabase[shortURL]['longURL'];
     res.redirect(longURL);
   } else {
@@ -138,7 +144,7 @@ app.get("/u/:shortURL", (req, res) => {
 
 app.get("/register", (req, res) => {
   const user_id = req.cookies.user_id;
-  const templateVars = {  
+  const templateVars = {
     username: users[user_id],
     user_id: user_id};
   res.render("registration", templateVars);
@@ -146,7 +152,7 @@ app.get("/register", (req, res) => {
 
 app.get("/login", (req, res) => {
   const user_id = req.cookies.user_id;
-  const templateVars = {  
+  const templateVars = {
     username: users[user_id],
     user_id: user_id};
   res.render("login", templateVars);
@@ -156,13 +162,13 @@ app.get("/login", (req, res) => {
 //posts
 app.post("/urls/new", (req, res) => {
   const user_id = req.cookies.user_id;
-  if(user_id) {
+  if (user_id) {
     const shortURL = generateRandomString();
     const longURL = req.body.longURL;
     urlDatabase[shortURL] = {
       longURL: longURL,
       userID: user_id
-    }
+    };
     res.redirect(`/urls/${shortURL}`);
   } else {
     res.status(403).send({Error: 'Please login to create new URLs'});
@@ -171,14 +177,24 @@ app.post("/urls/new", (req, res) => {
 
 app.post("/urls/:shortURL/delete", (req, res) => {
   const shortURL = req.params.shortURL;
-  delete urlDatabase[shortURL];
+  const user_id = req.cookies.user_id;
+  if (urlDatabase[shortURL]['userID'] === user_id) {
+    delete urlDatabase[shortURL];
+  } else {
+    res.status(401).send({Error: "You are not permitted to delete this URL. Please register or log in to delete your URLs."});
+  }
   res.redirect("/urls");
 });//delete buttons index
 
 app.post("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
-  urlDatabase[shortURL]['longURL'] = req.body.newLongURL;
-  res.redirect(`/urls/${shortURL}`);
+  const user_id = req.cookies.user_id;
+  if (urlDatabase[shortURL]['userID'] === user_id) {
+    urlDatabase[shortURL]['longURL'] = req.body.newLongURL;
+    res.redirect(`/urls/${shortURL}`);
+  } else {
+    res.status(401).send({Error: "You are not permitted to edit this URL. Please register or log in to edit your URLs."});
+  }
 });//edit button show
 
 app.post("/logins", (req, res) => {
@@ -187,7 +203,7 @@ app.post("/logins", (req, res) => {
 
 app.post("/registers", (req, res) => {
   res.redirect('/register');
-})//register button header
+});//register button header
 
 app.post("/logout", (req, res) => {
   res.clearCookie('user_id');
@@ -196,11 +212,11 @@ app.post("/logout", (req, res) => {
 
 app.post("/register", (req, res) => {
   const userID = generateRandomString();
-  const {email, password }= req.body;
+  const {email, password } = req.body;
   if (email && password && checkEmails(email)) {
-    users[userID] = { 
-      id: userID, 
-      email: email, 
+    users[userID] = {
+      id: userID,
+      email: email,
       password: password
     };
     res.cookie('user_id', userID);
@@ -209,16 +225,16 @@ app.post("/register", (req, res) => {
     if (checkEmails(email)) {
       res.status(400).send({Error: 'please enter valid email and password'});
     } else {
-      res.status(400).send({Error: 'This email is already registered'})
+      res.status(400).send({Error: 'This email is already registered'});
     }
   }
 });//registration button on registration page + error handler
 
 app.post("/login", (req, res) => {
-  const {email, password }= req.body;
+  const {email, password } = req.body;
   if (checkEmails(email) === false) {
     const userID = findUserByEmail(email);
-    if(email === users[userID]['email'] && password === users[userID]['password']) {
+    if (email === users[userID]['email'] && password === users[userID]['password']) {
       res.cookie('user_id', userID);
       res.redirect('/urls');
     } else {
