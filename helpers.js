@@ -35,3 +35,5 @@ const urlsForUser = (userID, database) => {
 };
 
 module.exports = {urlsForUser, findUserByEmail, checkEmails, generateRandomString};
+
+//note: attempted to replace instances of checkEmails with findUserByEmail but was unsuccessful.

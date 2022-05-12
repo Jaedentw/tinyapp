@@ -1,4 +1,4 @@
-const {urlsForUser, findUserByEmail, checkEmails, generateRandomString} = require("./helpers")
+const {urlsForUser, findUserByEmail, checkEmails, generateRandomString} = require("./helpers");
 const cookieSession = require('cookie-session');
 const express = require("express");
 const app = express();
@@ -31,7 +31,7 @@ const urlDatabase = {
 const users = {
   'user': {
     id: 'user',
-    email: 'jay@me.com',
+    email: 'user@email.com',
     password: 'password',
   }
 };
@@ -86,7 +86,7 @@ app.get("/urls/:shortURL", (req, res) => {
   } else {
     res.status(403).send({Error: "You must be logged in and the creator of the specified URL to access this page."});
   }
-});
+});//show page, no unlogged
 
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
@@ -96,7 +96,7 @@ app.get("/u/:shortURL", (req, res) => {
   } else {
     res.status(404).send({Error:"This link does not exist"});
   }
-});
+});//longURL redirect + error handling
 
 app.get("/register", (req, res) => {
   const user_id = req.session.user_id;
@@ -129,7 +129,7 @@ app.post("/urls/new", (req, res) => {
   } else {
     res.status(403).send({Error: 'Please login to create new URLs'});
   }
-});//submit button new
+});//submit button new + error handling
 
 app.post("/urls/:shortURL/delete", (req, res) => {
   const shortURL = req.params.shortURL;
@@ -140,7 +140,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
     res.status(401).send({Error: "You are not permitted to delete this URL. Please register or log in to delete your URLs."});
   }
   res.redirect("/urls");
-});//delete buttons index
+});//delete buttons index + error handling
 
 app.post("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
@@ -151,7 +151,7 @@ app.post("/urls/:shortURL", (req, res) => {
   } else {
     res.status(401).send({Error: "You are not permitted to edit this URL. Please register or log in to edit your URLs."});
   }
-});//edit button show
+});//edit button show + error handling
 
 app.post("/logins", (req, res) => {
   res.redirect('/login');
