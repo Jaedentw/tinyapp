@@ -22,7 +22,6 @@ const findUserByEmail = (email, database) => {
       return database[user]['id'];
     }
   }
-  return false;
 };
 
 const urlsForUser = (userID, database) => {
