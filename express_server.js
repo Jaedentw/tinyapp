@@ -39,7 +39,7 @@ const users = {
 
 //gets
 app.get("/", (req, res) => {
-  res.redirect("/urls")
+  res.redirect("/urls");
 });
 
 app.get("/urls.json", (req, res) => {
@@ -55,7 +55,7 @@ app.get("/urls/new", (req, res) => {
   const templateVars = {
     username: users[user_id]
   };
-  if(user_id) {
+  if (user_id) {
     res.render("urls_new", templateVars);
   } else {
     res.redirect("/login");
