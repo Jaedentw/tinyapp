@@ -85,12 +85,12 @@ app.get("/urls/:shortURL", (req, res) => {
     urls: userURLs,
     user_id: user_id
   };
-  if (user_id) {
+  if (user_id === urlDatabase[shortURL]['userID']) {
     res.render("urls_show", templateVars);
   } else {
     res.status(403).send({Error: "You must be logged in and the creator of the specified URL to access this page."});
   }
-});//show page, no unlogged
+});//show page + error handling
 
 app.get("/u/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
