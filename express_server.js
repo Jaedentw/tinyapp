@@ -39,7 +39,7 @@ const users = {
 
 //gets
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  res.redirect("/urls")
 });
 
 app.get("/urls.json", (req, res) => {
@@ -55,7 +55,11 @@ app.get("/urls/new", (req, res) => {
   const templateVars = {
     username: users[user_id]
   };
-  res.render("urls_new", templateVars);
+  if(user_id) {
+    res.render("urls_new", templateVars);
+  } else {
+    res.redirect("/login");
+  }
 });
 
 app.get("/urls", (req, res) => {
@@ -147,7 +151,7 @@ app.post("/urls/:shortURL", (req, res) => {
   const user_id = req.session.user_id;
   if (urlDatabase[shortURL]['userID'] === user_id) {
     urlDatabase[shortURL]['longURL'] = req.body.newLongURL;
-    res.redirect(`/urls/${shortURL}`);
+    res.redirect(`/urls`);
   } else {
     res.status(401).send({Error: "You are not permitted to edit this URL. Please register or log in to edit your URLs."});
   }
