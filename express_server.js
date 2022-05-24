@@ -15,10 +15,6 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.set("view engine", "ejs");
 
-app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}!`);
-});
-
 
 //global objects
 const urlDatabase = {
@@ -78,14 +74,14 @@ app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const user_id = req.session.user_id;
   const userURLs = urlsForUser(user_id, urlDatabase);
-  const templateVars = {
-    shortURL: shortURL,
-    longURL: userURLs[shortURL]['longURL'],
-    username: users[user_id],
-    urls: userURLs,
-    user_id: user_id
-  };
-  if (user_id === urlDatabase[shortURL]['userID']) {
+  if (userURLs[shortURL] && user_id === urlDatabase[shortURL]['userID']) {
+    const templateVars = {
+      shortURL: shortURL,
+      username: users[user_id],
+      urls: userURLs,
+      user_id: user_id,
+      longURL: userURLs[shortURL]['longURL']
+    };
     res.render("urls_show", templateVars);
   } else {
     res.status(403).send({Error: "You must be logged in and the creator of the specified URL to access this page."});
@@ -208,3 +204,7 @@ app.post("/login", (req, res) => {
   }
 });//login button on login page + error handling
 
+//PORT
+app.listen(PORT, () => {
+  console.log(`App listening on port ${PORT}!`);
+});
